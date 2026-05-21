@@ -168,7 +168,7 @@ export default function App() {
   };
 
   return (
-    <div className={`w-full min-h-screen relative overflow-y-auto scrollbar-hide flex flex-col items-center justify-start transition-colors duration-500 ${
+    <div className={`w-full min-h-screen relative flex flex-col items-center justify-start transition-colors duration-500 ${
       temaTech ? "theme-tech bg-[#0B0F19] text-[#F3F4F6]" : "bg-[#F8F6F2] text-[#23292F]"
     }`}>
       
@@ -674,54 +674,101 @@ export default function App() {
         </div>
       </section>
 
-      {/* Footer Rectangular Plano Estilo gob.mx */}
-      <footer className="w-full bg-[var(--bg-footer)] border-t border-[var(--color-border-footer)] relative z-30 py-12 px-6 md:px-12 transition-colors duration-500">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          {/* Lado izquierdo: Logotipo oficial */}
-          <div className="flex items-center gap-3">
-            <div className={temaTech ? "text-cyan-400" : "text-[#BC955C]"}>
-              <EscudoNacional className="w-10 h-10" />
+      {/* Footer Rectangular Plano Estilo gob.mx (Grande y Rojo) */}
+      <footer className="w-full bg-[var(--bg-footer)] border-t border-[var(--color-border-footer)] relative z-30 pt-16 pb-8 px-6 md:px-12 transition-colors duration-500">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 pb-12 border-b border-white/10">
+          
+          {/* Columna 1: Logotipo Oficial Grande */}
+          <div className="flex flex-col items-start gap-4">
+            <div className="flex items-center gap-3 select-none">
+              <div className={temaTech ? "text-cyan-400" : "text-[#BC955C]"}>
+                <EscudoNacional className="w-14 h-14" />
+              </div>
+              <div className="flex flex-col text-left leading-none text-white border-l border-white/20 pl-3">
+                <span className="text-xs tracking-wider uppercase font-bold opacity-90">Gobierno de México</span>
+                <span className="text-xl font-display font-black tracking-tight mt-0.5">SIGEDI</span>
+              </div>
             </div>
-            <div className="flex flex-col text-left leading-none text-white border-l border-white/20 pl-3">
-              <span className="text-[10px] tracking-wider uppercase font-semibold opacity-85">Gobierno de México</span>
-              <span className="text-base font-display font-extrabold tracking-tight">SIGEDI</span>
+            <p className="text-[10px] text-white/60 leading-relaxed font-sans mt-2 text-left">
+              Sistema Inteligente de Gestión Documental. Desarrollado para eficientar el análisis semántico, verificación de integridad y auditoría de documentos públicos gubernamentales.
+            </p>
+          </div>
+
+          {/* Columna 2: Enlaces Rápidos (Navegación) */}
+          <div className="flex flex-col items-start gap-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white border-b border-white/20 pb-2 w-full text-left font-display">
+              Secciones
+            </h4>
+            <div className="flex flex-col gap-2.5 text-xs text-white/80 text-left font-medium">
+              <button onClick={() => hacerScrollASeccion("seguridad")} className="hover:text-white transition-colors cursor-pointer text-left bg-transparent border-none p-0 outline-none">
+                Seguridad e Integridad
+              </button>
+              <button onClick={() => hacerScrollASeccion("sincronizacion")} className="hover:text-white transition-colors cursor-pointer text-left bg-transparent border-none p-0 outline-none">
+                Sincronización en la Nube
+              </button>
+              <button onClick={() => hacerScrollASeccion("capacidades")} className="hover:text-white transition-colors cursor-pointer text-left bg-transparent border-none p-0 outline-none">
+                Asistente de Auditoría
+              </button>
+              <button onClick={() => window.location.href = "/app"} className="hover:text-white transition-colors cursor-pointer text-left bg-transparent border-none p-0 outline-none">
+                Espacio de Trabajo Local
+              </button>
             </div>
           </div>
 
-          {/* Enlaces de Utilidad */}
-          <div className="flex gap-8 text-xs font-bold uppercase tracking-wider text-white/80">
-            <button 
-              onClick={() => setModalDocsAbierta(true)} 
-              className="hover:text-white transition-colors flex items-center gap-1.5 bg-transparent border-none outline-none cursor-pointer font-display"
-            >
-              <FileText className="w-4 h-4" /> Docs
-            </button>
-            <button 
-              onClick={() => setModalGithubAbierta(true)} 
-              className="hover:text-white transition-colors flex items-center gap-1.5 bg-transparent border-none outline-none cursor-pointer font-display"
-            >
-              <IconoGithub className="w-4 h-4" /> GitHub
-            </button>
-            <button 
-              onClick={() => setModalSoporteAbierta(true)} 
-              className="hover:text-white transition-colors flex items-center gap-1.5 bg-transparent border-none outline-none cursor-pointer font-display"
-            >
-              <Mail className="w-4 h-4" /> Soporte
-            </button>
+          {/* Columna 3: Documentación y Código */}
+          <div className="flex flex-col items-start gap-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white border-b border-white/20 pb-2 w-full text-left font-display">
+              Recursos
+            </h4>
+            <div className="flex flex-col gap-2.5 text-xs text-white/80 text-left font-medium">
+              <button 
+                onClick={() => setModalDocsAbierta(true)} 
+                className="hover:text-white transition-colors flex items-center gap-1.5 bg-transparent border-none p-0 outline-none cursor-pointer"
+              >
+                <FileText className="w-3.5 h-3.5" /> Documentación RAG
+              </button>
+              <button 
+                onClick={() => setModalGithubAbierta(true)} 
+                className="hover:text-white transition-colors flex items-center gap-1.5 bg-transparent border-none p-0 outline-none cursor-pointer"
+              >
+                <IconoGithub className="w-3.5 h-3.5" /> Código Fuente (GitHub)
+              </button>
+              <button 
+                onClick={() => setModalSoporteAbierta(true)} 
+                className="hover:text-white transition-colors flex items-center gap-1.5 bg-transparent border-none p-0 outline-none cursor-pointer"
+              >
+                <Mail className="w-3.5 h-3.5" /> Mesa de Soporte Técnico
+              </button>
+            </div>
           </div>
 
-          {/* Créditos del Equipo */}
-          <div className="text-center md:text-right text-[10px] text-white/60 font-sans leading-tight">
-            <span className="block font-bold text-white/80 uppercase font-display tracking-wider mb-1">Desarrolladores SIGEDI</span>
-            Javier Mar • José Avilés • Diego Alonso • Ana Iveth • Sury Cristino
+          {/* Columna 4: Contacto y Equipo */}
+          <div className="flex flex-col items-start gap-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white border-b border-white/20 pb-2 w-full text-left font-display">
+              Contacto y Equipo
+            </h4>
+            <div className="text-left text-[11px] text-white/80 leading-relaxed font-sans">
+              <span className="block font-bold text-white uppercase font-display tracking-wider mb-1.5">Mesa de Ayuda SIGEDI</span>
+              <p className="text-white/60 mb-3">soporte@sigedi.gob.mx</p>
+              <span className="block font-bold text-white uppercase font-display tracking-wider mb-1.5">Desarrolladores</span>
+              <p className="text-white/60">
+                Javier Mar • José Avilés • Diego Alonso • Ana Iveth • Sury Cristino
+              </p>
+            </div>
           </div>
+
         </div>
 
-        {/* Fila de Derechos Reservados */}
-        <div className="max-w-6xl mx-auto border-t border-white/10 mt-8 pt-6 text-center">
+        {/* Fila de Derechos Reservados y Afiliaciones */}
+        <div className="max-w-6xl mx-auto pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
           <p className="text-[10px] text-white/50 font-medium font-sans">
             © 2026 SIGEDI. Todos los derechos reservados. Desarrollado en colaboración con ITSNA y TecNM para la gestión pública inteligente.
           </p>
+          <div className="flex items-center gap-6 opacity-45 hover:opacity-75 transition-opacity duration-300">
+            <span className="text-[11px] font-display font-black tracking-widest text-white cursor-default">ITSNA</span>
+            <span className="text-[11px] font-display font-black tracking-widest text-white cursor-default">TECNM</span>
+            <span className="text-[11px] font-display font-black tracking-widest text-white cursor-default">VERACRUZ</span>
+          </div>
         </div>
       </footer>
 
