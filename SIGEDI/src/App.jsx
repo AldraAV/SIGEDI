@@ -254,13 +254,25 @@ export default function App() {
           className="flex items-center gap-3 cursor-pointer select-none group" 
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
-          <div className={temaTech ? "text-cyan-400" : "text-[#BC955C]"}>
-            <EscudoNacional className="w-9 h-9" />
-          </div>
-          <div className="flex flex-col text-left leading-none text-white border-l border-white/20 pl-3">
-            <span className="text-[10px] tracking-wider uppercase font-semibold opacity-85">Gobierno de México</span>
-            <span className="text-base font-display font-extrabold tracking-tight">SIGEDI</span>
-          </div>
+          {temaTech ? (
+            <>
+              <div className="text-cyan-400">
+                <EscudoNacional className="w-9 h-9" />
+              </div>
+              <div className="flex flex-col text-left leading-none text-white border-l border-white/20 pl-3">
+                <span className="text-[10px] tracking-wider uppercase font-semibold opacity-85">Gobierno de México</span>
+                <span className="text-base font-display font-extrabold tracking-tight">SIGEDI</span>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center gap-3">
+              <img src="/logo-gobierno.png" alt="Gobierno de México" className="h-9 w-auto object-contain" />
+              <div className="text-white border-l border-white/20 pl-3 text-left font-display leading-none">
+                <span className="text-[10px] font-semibold opacity-70 block tracking-wider text-slate-300">SISTEMA</span>
+                <span className="text-base font-extrabold tracking-tight block">SIGEDI</span>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-8">
@@ -681,13 +693,25 @@ export default function App() {
           {/* Columna 1: Logotipo Oficial Grande */}
           <div className="flex flex-col items-start gap-4">
             <div className="flex items-center gap-3 select-none">
-              <div className={temaTech ? "text-cyan-400" : "text-[#BC955C]"}>
-                <EscudoNacional className="w-14 h-14" />
-              </div>
-              <div className="flex flex-col text-left leading-none text-white border-l border-white/20 pl-3">
-                <span className="text-xs tracking-wider uppercase font-bold opacity-90">Gobierno de México</span>
-                <span className="text-xl font-display font-black tracking-tight mt-0.5">SIGEDI</span>
-              </div>
+              {temaTech ? (
+                <>
+                  <div className="text-cyan-400">
+                    <EscudoNacional className="w-14 h-14" />
+                  </div>
+                  <div className="flex flex-col text-left leading-none text-white border-l border-white/20 pl-3">
+                    <span className="text-xs tracking-wider uppercase font-bold opacity-90">Gobierno de México</span>
+                    <span className="text-xl font-display font-black tracking-tight mt-0.5">SIGEDI</span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <img src="/logo-gobierno.png" alt="Gobierno de México" className="h-12 w-auto object-contain" />
+                  <div className="text-white border-l border-white/20 pl-3 text-left font-display leading-none">
+                    <span className="text-[10px] font-semibold opacity-70 block tracking-wider text-slate-300">SISTEMA</span>
+                    <span className="text-lg font-black tracking-tight block">SIGEDI</span>
+                  </div>
+                </div>
+              )}
             </div>
             <p className="text-[10px] text-white/60 leading-relaxed font-sans mt-2 text-left">
               Sistema Inteligente de Gestión Documental. Desarrollado para eficientar el análisis semántico, verificación de integridad y auditoría de documentos públicos gubernamentales.
