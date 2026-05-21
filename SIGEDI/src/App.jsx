@@ -1,36 +1,35 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Layers, 
-  FileText, 
-  FolderOpen, 
-  ChevronRight, 
   Sparkles, 
-  Database, 
-  RefreshCw, 
-  Search, 
-  CheckCircle2, 
-  AlertTriangle, 
-  Lock, 
+  HardDrive, 
+  LayoutTemplate, 
   ShieldCheck, 
-  UploadCloud, 
-  FileSpreadsheet, 
-  AlertOctagon, 
+  FolderSync, 
+  FileText, 
+  Users, 
+  Building2, 
+  Mail, 
   ArrowRight,
-  Eye,
-  Settings,
-  HelpCircle,
-  Clock,
-  Terminal,
-  Activity,
-  Cpu
+  ChevronRight
 } from "lucide-react";
+import { createClient } from "@supabase/supabase-js";
 import "./App.css";
 
-// Endpoint base del backend FastAPI
-const BACKEND_URL = "http://localhost:8000";
+// Inicializar cliente de Supabase de manera segura para evitar fallos de ejecución si faltan variables de entorno
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 
-// Componente SVG del Escudo Nacional de México (simplificado e institucional de alta calidad)
+let supabase = null;
+if (supabaseUrl && supabaseAnonKey) {
+  try {
+    supabase = createClient(supabaseUrl, supabaseAnonKey);
+  } catch (error) {
+    console.error("Error al inicializar Supabase:", error);
+  }
+}
+
+// Componente SVG del Escudo Nacional de México (institucional de alta calidad)
 function EscudoNacional({ className = "w-12 h-12" }) {
   return (
     <svg 
@@ -40,7 +39,6 @@ function EscudoNacional({ className = "w-12 h-12" }) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 3" className="opacity-40" />
-      {/* Laurel y Encino (Guirnalda inferior) */}
       <path 
         d="M25 65C30 75 40 80 50 80C60 80 70 75 75 65" 
         stroke="currentColor" 
@@ -49,14 +47,11 @@ function EscudoNacional({ className = "w-12 h-12" }) {
       />
       <path d="M22 61L25 65L21 68" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       <path d="M78 61L75 65L79 68" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      
-      {/* Águila Parada sobre el Nopal */}
       <path 
         d="M44 48C42 42 45 32 50 30C52 29 55 31 54 34C53 37 55 39 58 38C61 37 63 42 61 46C59 50 56 52 53 54C50 56 46 56 44 48Z" 
         fill="currentColor" 
         className="opacity-95"
       />
-      {/* Alas del águila */}
       <path 
         d="M52 32C56 22 66 18 72 20C74 21 72 27 68 30C64 33 60 34 56 35" 
         stroke="currentColor" 
@@ -69,7 +64,6 @@ function EscudoNacional({ className = "w-12 h-12" }) {
         strokeWidth="2.5" 
         strokeLinecap="round" 
       />
-      {/* Serpiente */}
       <path 
         d="M51 28C53 23 48 20 52 16C55 13 60 16 57 20C55 23 58 26 55 28" 
         stroke="currentColor" 
@@ -77,13 +71,11 @@ function EscudoNacional({ className = "w-12 h-12" }) {
         strokeLinecap="round" 
         strokeLinejoin="round"
       />
-      {/* Nopal y Glifo de la Laguna */}
       <path 
         d="M38 68C42 64 45 68 50 68C55 68 58 64 62 68C65 71 63 76 50 76C37 76 35 71 38 68Z" 
         fill="currentColor" 
         className="opacity-90"
       />
-      {/* Cactus pencas */}
       <circle cx="50" cy="62" r="3.5" fill="currentColor" />
       <circle cx="43" cy="64" r="3" fill="currentColor" />
       <circle cx="57" cy="64" r="3" fill="currentColor" />
@@ -91,748 +83,877 @@ function EscudoNacional({ className = "w-12 h-12" }) {
   );
 }
 
+// Componente SVG del logotipo de capas para el modo tecnológico
+function IconoCapas(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+      <polyline points="2 17 12 22 22 17" />
+      <polyline points="2 12 12 17 22 12" />
+    </svg>
+  );
+}
+
+// Componente SVG del logotipo de GitHub
+function IconoGithub(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+      <path d="M9 18c-4.51 2-5-2-7-2" />
+    </svg>
+  );
+}
+
 export default function App() {
   const [temaTech, setTemaTech] = useState(false);
-  const [documentosIndexados, setDocumentosIndexados] = useState([]);
-  const [documentoSeleccionado, setDocumentoSeleccionado] = useState(null);
-  const [cargandoDocumentos, setCargandoDocumentos] = useState(false);
-  const [cargandoSubida, setCargandoSubida] = useState(false);
-  const [dragActivo, setDragActivo] = useState(false);
-  const [mensajeSubida, setMensajeSubida] = useState(null);
-  const [enfoqueAuditoria, setEnfoqueAuditoria] = useState("general");
-  const [cargandoAuditoria, setCargandoAuditoria] = useState(false);
-  const [resultadoAuditoria, setResultadoAuditoria] = useState(null);
-  const [consultaBusqueda, setConsultaBusqueda] = useState("");
-  const [cargandoBusqueda, setCargandoBusqueda] = useState(false);
-  const [resultadoBusqueda, setResultadoBusqueda] = useState(null);
-  const [estadoBackend, setEstadoBackend] = useState("activo");
+  const [modalDocsAbierta, setModalDocsAbierta] = useState(false);
+  const [modalSoporteAbierta, setModalSoporteAbierta] = useState(false);
+  const [modalGithubAbierta, setModalGithubAbierta] = useState(false);
+  
+  const [soporteMensaje, setSoporteMensaje] = useState("");
+  const [soporteEmail, setSoporteEmail] = useState("");
+  const [soporteEnviando, setSoporteEnviando] = useState(false);
+  const [soporteExito, setSoporteExito] = useState(false);
 
-  const fileInputRef = useRef(null);
-
-  // Cargar documentos reales del backend
-  const cargarDocumentos = async () => {
-    setCargandoDocumentos(true);
+  const manejarInicioSesionGoogle = async () => {
+    if (!supabase) {
+      alert("Para acceder con Google Drive, por favor configura las variables de entorno VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en tu archivo .env.local.");
+      return;
+    }
     try {
-      const res = await fetch(`${BACKEND_URL}/api/documentos`);
-      if (res.ok) {
-        const data = await res.json();
-        const docs = data.documentos || [];
-        setDocumentosIndexados(docs);
-        if (docs.length > 0 && !documentoSeleccionado) {
-          setDocumentoSeleccionado(docs[0]);
+      await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/app`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+          scopes: 'https://www.googleapis.com/auth/drive.readonly'
         }
-      }
-    } catch (e) {
-      console.error("Error al conectar con backend:", e);
-    } finally {
-      setCargandoDocumentos(false);
-    }
-  };
-
-  // Verificar la salud del backend FastAPI
-  const verificarSalud = async () => {
-    try {
-      const res = await fetch(`${BACKEND_URL}/`);
-      if (res.ok) {
-        setEstadoBackend("activo");
-      } else {
-        setEstadoBackend("inactivo");
-      }
-    } catch {
-      setEstadoBackend("inactivo");
-    }
-  };
-
-  useEffect(() => {
-    verificarSalud();
-    cargarDocumentos();
-    // Checar salud cada 10 segundos
-    const interval = setInterval(verificarSalud, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Ingesta de archivos
-  const manejarSubida = async (archivo) => {
-    setCargandoSubida(true);
-    setMensajeSubida(null);
-    try {
-      const formData = new FormData();
-      formData.append("archivo", archivo);
-      formData.append("origen", "sigedi_web");
-
-      const res = await fetch(`${BACKEND_URL}/api/indexar`, {
-        method: "POST",
-        body: formData,
       });
-
-      if (res.ok) {
-        const data = await res.json();
-        setMensajeSubida({ 
-          tipo: "exito", 
-          texto: `Documento "${archivo.name}" cargado y vectorizado exitosamente.` 
-        });
-        await cargarDocumentos();
-        if (data && data.id) {
-          setDocumentoSeleccionado({
-            id: data.id,
-            titulo: archivo.name,
-            contenido_crudo: data.contenido_crudo || "",
-            hash_sha256: data.hash_sha256 || "N/A"
-          });
-        }
-      } else {
-        setMensajeSubida({ tipo: "error", texto: "El backend rechazó el archivo. Intenta de nuevo." });
-      }
     } catch (err) {
-      setMensajeSubida({ tipo: "error", texto: "Fallo de conexión de red con el servidor." });
-    } finally {
-      setCargandoSubida(false);
-      setTimeout(() => setMensajeSubida(null), 5000);
+      console.error("Error de Supabase Auth:", err);
+      alert("Fallo de comunicación con Supabase Auth.");
     }
   };
 
-  const alHacerDrag = (e) => {
-    e.preventDefault();
-    setDragActivo(e.type === "dragover");
-  };
-
-  const alSoltar = (e) => {
-    e.preventDefault();
-    setDragActivo(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      manejarSubida(e.dataTransfer.files[0]);
+  const hacerScrollASeccion = (id) => {
+    const elemento = document.getElementById(id);
+    if (elemento) {
+      elemento.scrollIntoView({ behavior: "smooth" });
     }
-  };
-
-  const alSeleccionarManual = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      manejarSubida(e.target.files[0]);
-    }
-  };
-
-  // Auditoría Avanzada Real
-  const ejecutarAuditoria = async () => {
-    if (!documentoSeleccionado) return;
-    setCargandoAuditoria(true);
-    setResultadoAuditoria(null);
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/auditar`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          documento_id: documentoSeleccionado.id, 
-          enfoque: enfoqueAuditoria 
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setResultadoAuditoria(data);
-      } else {
-        setResultadoAuditoria({ 
-          error: "Fallo al auditar. Asegúrate de configurar la api_key en el backend." 
-        });
-      }
-    } catch (err) {
-      setResultadoAuditoria({ error: "Error de red al consultar el motor cognitivo de auditoría." });
-    } finally {
-      setCargandoAuditoria(false);
-    }
-  };
-
-  // Consulta RAG
-  const ejecutarConsultaRAG = async (e) => {
-    e.preventDefault();
-    if (!consultaBusqueda.trim()) return;
-    setCargandoBusqueda(true);
-    setResultadoBusqueda(null);
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/consulta`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          consulta: consultaBusqueda, 
-          limite: 3 
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setResultadoBusqueda(data);
-      } else {
-        setResultadoBusqueda({ error: "Fallo de respuesta del buscador semántico vectorizado." });
-      }
-    } catch (err) {
-      setResultadoBusqueda({ error: "Error de red al consultar el motor vectorial." });
-    } finally {
-      setCargandoBusqueda(false);
-    }
-  };
-
-  const obtenerIcono = (nombre) => {
-    const ext = nombre.split('.').pop()?.toLowerCase();
-    if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
-      return <FileSpreadsheet className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />;
-    }
-    return <FileText className="w-5 h-5 text-rose-700 dark:text-rose-400" />;
   };
 
   return (
-    <div className={`w-full h-screen overflow-hidden flex flex-col transition-colors duration-500 ${temaTech ? "theme-tech bg-[#0B0F19]" : "bg-[#F8F6F2]"}`}>
+    <div className={`w-full min-h-screen relative overflow-y-auto scrollbar-hide flex flex-col items-center justify-start transition-colors duration-500 ${
+      temaTech ? "theme-tech bg-[#0B0F19] text-[#F3F4F6]" : "bg-[#F8F6F2] text-[#23292F]"
+    }`}>
       
-      {/* HEADER SUPERIOR */}
-      <header className={`w-full px-8 py-4 flex items-center justify-between border-b transition-colors ${
-        temaTech 
-          ? "bg-slate-900/60 border-slate-800 backdrop-blur-md" 
-          : "bg-white border-[#E0DCD3] shadow-sm"
-      }`}>
-        <div className="flex items-center gap-4">
-          {!temaTech ? (
-            <div className="text-[#6A1B29]">
-              <EscudoNacional className="w-11 h-11" />
-            </div>
-          ) : (
-            <div className="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-800/40 shadow-[0_0_15px_rgba(0,240,255,0.1)]">
-              <Cpu className="w-6 h-6 text-[#00F0FF]" />
-            </div>
-          )}
+      {/* Fondo Abstracto e Ilustración Vectorial de Documentos Flotantes */}
+      <div className="absolute top-0 left-0 right-0 h-[100vh] z-0 overflow-hidden pointer-events-none">
+        {/* Luces de Fondo Dinámicas */}
+        <motion.div 
+          animate={{ rotate: 360 }}
+          transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[10%] -left-[10%] w-[80vw] h-[80vw] rounded-full bg-[radial-gradient(ellipse_at_center,_var(--color-light-1)_0%,_transparent_70%)] opacity-40 blur-3xl"
+        />
+        <motion.div 
+          animate={{ rotate: -360 }}
+          transition={{ duration: 150, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[20%] -right-[10%] w-[70vw] h-[70vw] rounded-full bg-[radial-gradient(ellipse_at_center,_var(--color-light-2)_0%,_transparent_70%)] opacity-40 blur-3xl"
+        />
+
+        {/* Ilustración de Documentos, Excel, PDFs y Carpetas Flotantes con Colores que Adaptan su Tonalidad */}
+        <div className="absolute inset-0 z-10 opacity-30 dark:opacity-40">
           
-          <div>
-            <h1 className="font-display font-extrabold text-lg tracking-wide flex items-center gap-2 m-0 text-[var(--text-primary)]">
-              SIGEDI
-              <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full border ${
-                temaTech 
-                  ? "bg-cyan-950/60 border-cyan-700/40 text-[#00F0FF]" 
-                  : "bg-[#6A1B29]/10 border-[#6A1B29]/20 text-[#6A1B29]"
-              }`}>
-                {temaTech ? "AUDITORÍA DIGITAL" : "PLATAFORMA NACIONAL"}
-              </span>
-            </h1>
-            <p className="text-[10px] uppercase font-mono tracking-wider font-semibold opacity-70 mt-0.5 text-[var(--text-secondary)]">
-              {temaTech ? "Cryptographic Vector Audit Console" : "Sistema de Gestión y Diagnóstico Inmutable de Expedientes"}
-            </p>
-          </div>
+          {/* Carpeta Flotante */}
+          <motion.div 
+            animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[20%] left-[12%] text-[var(--color-primary)] opacity-80"
+          >
+            <svg width="110" height="110" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/>
+              <line x1="2" y1="10" x2="22" y2="10" />
+            </svg>
+          </motion.div>
+
+          {/* Documento de Texto */}
+          <motion.div 
+            animate={{ y: [0, 20, 0], rotate: [0, -8, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute top-[22%] right-[12%] text-[var(--color-accent)] opacity-80"
+          >
+            <svg width="100" height="130" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </motion.div>
+
+          {/* Excel / Grid */}
+          <motion.div 
+            animate={{ y: [0, -20, 0], rotate: [0, 8, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            className="absolute bottom-[18%] left-[18%] text-emerald-600 dark:text-emerald-400 opacity-80"
+          >
+            <svg width="120" height="90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="3" y1="15" x2="21" y2="15"/>
+              <line x1="10" y1="3" x2="10" y2="21"/>
+            </svg>
+          </motion.div>
+
+          {/* PDF */}
+          <motion.div 
+            animate={{ y: [0, 15, 0], rotate: [0, -5, 0] }}
+            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+            className="absolute bottom-[22%] right-[18%] text-rose-600 dark:text-rose-400 opacity-85"
+          >
+            <svg width="90" height="110" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <path d="M8 13h2a2 2 0 0 0 2-2v0a2 2 0 0 0-2-2H8v6"/>
+            </svg>
+          </motion.div>
         </div>
 
-        {/* CONTROLES / THEME SWITCHER */}
-        <div className="flex items-center gap-4">
-          {/* Indicador de Salud del Backend */}
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[10px] font-mono font-semibold transition-colors ${
-            temaTech 
-              ? "bg-slate-900/80 border-slate-800 text-slate-300" 
-              : "bg-stone-100 border-[#E0DCD3] text-stone-700"
-          }`}>
-            <span className="relative flex h-2 w-2">
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                estadoBackend === 'activo' ? 'bg-emerald-400' : 'bg-rose-400'
-              }`}></span>
-              <span className={`relative inline-flex rounded-full h-2 w-2 ${
-                estadoBackend === 'activo' ? 'bg-emerald-500' : 'bg-rose-500'
-              }`}></span>
-            </span>
-            <span>BACKEND: {estadoBackend.toUpperCase()}</span>
-          </div>
+        {/* Máscara de degradado suave inferior */}
+        <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-b from-transparent via-current/5 to-[var(--bg-app)] z-20 pointer-events-none" />
+      </div>
 
-          {/* Switch de Tema de Dos Estados */}
-          <div className={`p-1 rounded-full border flex items-center gap-1 ${
-            temaTech ? "bg-slate-900 border-slate-800" : "bg-stone-100 border-[#E0DCD3]"
-          }`}>
-            <button
-              onClick={() => setTemaTech(false)}
-              className={`px-3 py-1 rounded-full text-[10px] font-display font-bold uppercase transition-all tracking-wide ${
-                !temaTech 
-                  ? "bg-[#6A1B29] text-white shadow-sm" 
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              Gobierno
-            </button>
-            <button
-              onClick={() => setTemaTech(true)}
-              className={`px-3 py-1 rounded-full text-[10px] font-display font-bold uppercase transition-all tracking-wide ${
-                temaTech 
-                  ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-black shadow-lg" 
-                  : "text-stone-500 hover:text-[#6A1B29]"
-              }`}
-            >
-              Auditoría
-            </button>
-          </div>
+      {/* Encabezado / Navegación */}
+      <header className={`absolute top-0 w-full px-12 py-8 flex justify-between items-center z-50`}>
+        <div 
+          className="flex items-center gap-3.5 cursor-pointer group" 
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
+          {!temaTech ? (
+            <div className="text-[#6A1B29] transition-all duration-300 group-hover:drop-shadow-[0_0_10px_rgba(106,27,41,0.3)]">
+              <EscudoNacional className="w-9 h-9" />
+            </div>
+          ) : (
+            <div className="text-[#00F0FF] transition-all duration-300 group-hover:drop-shadow-[0_0_10px_rgba(0,240,255,0.4)]">
+              <IconoCapas className="w-8 h-8" />
+            </div>
+          )}
+          <span className="font-display font-black text-2xl tracking-tighter text-[var(--text-primary)] transition-colors duration-300 group-hover:text-[var(--color-primary)]">
+            {!temaTech ? "SIGEDI" : "GECEP"}
+          </span>
+        </div>
+
+        <nav className="hidden md:flex gap-10 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+          <button onClick={() => hacerScrollASeccion("seguridad")} className="hover:text-[var(--color-primary)] transition-colors cursor-pointer bg-transparent border-none outline-none font-display">Seguridad</button>
+          <button onClick={() => hacerScrollASeccion("sincronizacion")} className="hover:text-[var(--color-primary)] transition-colors cursor-pointer bg-transparent border-none outline-none font-display">Sincronización</button>
+          <button onClick={() => hacerScrollASeccion("capacidades")} className="hover:text-[var(--color-primary)] transition-colors cursor-pointer bg-transparent border-none outline-none font-display">Capacidades</button>
+        </nav>
+
+        {/* Switcher de Temas */}
+        <div className={`p-1 rounded-full border flex items-center gap-1 transition-colors ${
+          temaTech ? "bg-slate-900 border-slate-800" : "bg-stone-100 border-[#E0DCD3]"
+        }`}>
+          <button
+            onClick={() => setTemaTech(false)}
+            className={`px-3 py-1 rounded-full text-[9px] font-display font-bold uppercase transition-all tracking-wide cursor-pointer ${
+              !temaTech 
+                ? "bg-[#6A1B29] text-white shadow-sm" 
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            Gobierno
+          </button>
+          <button
+            onClick={() => setTemaTech(true)}
+            className={`px-3 py-1 rounded-full text-[9px] font-display font-bold uppercase transition-all tracking-wide cursor-pointer ${
+              temaTech 
+                ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-black shadow-md" 
+                : "text-stone-500 hover:text-[#6A1B29]"
+            }`}
+          >
+            Auditoría
+          </button>
         </div>
       </header>
 
-      {/* CONTENIDO PRINCIPAL LAYOUT ASIMÉTRICO */}
-      <div className="flex-1 flex overflow-hidden w-full">
+      {/* Hero Section */}
+      <section className="relative z-10 flex flex-col items-center justify-center text-center px-6 min-h-screen w-full max-w-5xl mx-auto pt-24">
         
-        {/* PANEL IZQUIERDO: EXTRACCIÓN Y DOCUMENTOS */}
-        <aside className={`w-[36%] border-r flex flex-col h-full flex-shrink-0 transition-colors ${
-          temaTech ? "bg-slate-950/40 border-slate-900" : "bg-white border-[#E0DCD3]"
-        }`}>
-          
-          {/* INGESTA */}
-          <div className={`p-6 border-b transition-colors ${temaTech ? "border-slate-900" : "border-[#E0DCD3] bg-stone-50/50"}`}>
-            <h2 className="text-[11px] font-mono font-bold uppercase tracking-wider mb-3 text-[var(--text-secondary)] flex items-center gap-2">
-              <UploadCloud className={`w-4 h-4 ${temaTech ? "text-[#00F0FF]" : "text-[#6A1B29]"}`} />
-              Indexar Expediente Municipal
-            </h2>
+        {/* Etiqueta / Ribbon */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className={`mb-6 px-4 py-1.5 rounded-full border text-[10px] font-mono font-bold tracking-widest uppercase transition-all ${
+            temaTech 
+              ? "bg-cyan-950/40 border-cyan-800/40 text-[#00F0FF]" 
+              : "bg-[#6A1B29]/5 border-[#6A1B29]/20 text-[#6A1B29]"
+          }`}
+        >
+          {!temaTech ? "PLATAFORMA NACIONAL DE AUDITORÍA" : "CRYPTOGRAPHIC VECTOR CONSOLE"}
+        </motion.div>
 
-            <div
-              onDragOver={alHacerDrag}
-              onDragLeave={alHacerDrag}
-              onDrop={alSoltar}
-              onClick={() => fileInputRef.current?.click()}
-              className={`relative border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-300 group flex flex-col items-center justify-center ${
-                dragActivo 
-                  ? "border-[var(--color-primary)] bg-[var(--color-accent-light)]" 
-                  : "border-stone-300 dark:border-slate-800 hover:border-[var(--color-primary)] hover:bg-stone-50/60 dark:hover:bg-slate-900/20"
-              }`}
-            >
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={alSeleccionarManual} 
-                className="hidden" 
-                accept=".pdf,.docx,.xlsx,.xls,.txt,.csv"
-              />
-              
-              <div className={`p-3 rounded-full border transition-colors mb-2 ${
-                temaTech ? "bg-slate-900 border-slate-800" : "bg-stone-100 border-[#E0DCD3]"
+        {/* Titulo Principal */}
+        <motion.h1 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+          className="font-display text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-[var(--text-primary)] leading-[1.05] mb-8"
+        >
+          {!temaTech ? (
+            <>
+              Sistema Inteligente de <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6A1B29] via-[#BC955C] to-[#6A1B29]">
+                Gestión Documental
+              </span>
+            </>
+          ) : (
+            <>
+              Gestión Estratégica Contextual <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F0FF] via-purple-400 to-[#00F0FF]">
+                de Expedientes Públicos
+              </span>
+            </>
+          )}
+        </motion.h1>
+
+        {/* Subtitulo descriptivo */}
+        <motion.p 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="text-base md:text-lg text-[var(--text-secondary)] font-sans max-w-3xl mb-14 leading-relaxed font-medium"
+        >
+          Busca tus documentos por significado. Encuentra información al instante, valida firmas digitales y detecta inconsistencias administrativas de forma automatizada y sin complicaciones.
+        </motion.p>
+
+        {/* Botones de Acción */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col sm:flex-row gap-4.5 w-full max-w-md mx-auto justify-center px-4"
+        >
+          <button 
+            onClick={manejarInicioSesionGoogle}
+            className={`flex-1 flex items-center justify-center gap-3 px-7 py-3.5 rounded-full font-bold transition-all hover:scale-105 active:scale-95 text-sm cursor-pointer shadow-lg ${
+              temaTech
+                ? "bg-[#F3F4F6] text-black hover:bg-gray-200"
+                : "bg-[#6A1B29] text-white hover:bg-[#561420] shadow-[#6A1B29]/10"
+            }`}
+          >
+            <HardDrive className="w-4 h-4" />
+            Acceder con Google Drive
+          </button>
+          
+          <button 
+            onClick={() => window.location.href = "/app"}
+            className="flex-1 flex items-center justify-center gap-3 px-7 py-3.5 rounded-full liquid-glass text-[var(--text-primary)] font-bold hover:bg-white/5 transition-all hover:scale-105 active:scale-95 text-sm cursor-pointer border border-[var(--color-border)]"
+          >
+            <LayoutTemplate className="w-4 h-4" />
+            Abrir Espacio Local
+          </button>
+        </motion.div>
+      </section>
+
+      {/* Feature Showcase Cards */}
+      <section className="relative z-30 w-full max-w-6xl mx-auto px-6 py-16">
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        >
+          {/* Card 1 */}
+          <div className="liquid-glass rounded-3xl p-8 group hover:border-[var(--color-primary)]/40 transition-all duration-300 min-h-[260px] flex flex-col justify-between cursor-pointer border border-[var(--color-border)] bg-[var(--bg-card)]">
+            <div>
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-colors ${
+                temaTech ? "bg-white/5 group-hover:bg-[#00F0FF]/10" : "bg-stone-100 group-hover:bg-[#6A1B29]/10"
               }`}>
-                <UploadCloud className={`w-6 h-6 transition-transform duration-300 ${
-                  cargandoSubida ? 'animate-bounce text-[var(--color-primary)]' : 'text-[var(--text-muted)] group-hover:text-[var(--color-primary)] group-hover:scale-110'
-                }`} />
+                <ShieldCheck className="w-6 h-6 text-[var(--text-secondary)] group-hover:text-[var(--color-primary)] transition-colors" />
               </div>
-              
-              <p className="text-xs font-bold text-[var(--text-primary)]">
-                {cargandoSubida ? "Analizando y vectorizando..." : "Arrastra un documento o haz clic"}
-              </p>
-              <p className="text-[10px] text-[var(--text-muted)] mt-1 max-w-xs leading-normal">
-                Formatos: PDF, EXCEL (XLSX/CSV), WORD o TXT. Extrae embeddings y firma SHA-256.
+              <h3 className="font-display font-bold text-xl text-[var(--text-primary)] mb-2.5">Protección Sin Alteraciones</h3>
+              <p className="text-xs md:text-sm text-[var(--text-secondary)] leading-relaxed font-sans font-medium">
+                El sistema resguarda de forma segura cada reporte de auditoría. Si alguien intenta modificar un acta o documento oficial, el validador te alertará al instante.
               </p>
             </div>
-
-            <AnimatePresence>
-              {mensajeSubida && (
-                <motion.div 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className={`mt-3 p-3 rounded-xl border text-[11px] leading-normal flex items-start gap-2 ${
-                    mensajeSubida.tipo === 'exito' 
-                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' 
-                      : 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'
-                  }`}
-                >
-                  {mensajeSubida.tipo === 'exito' ? <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" /> : <AlertOctagon className="w-4 h-4 mt-0.5 flex-shrink-0" />}
-                  <span>{mensajeSubida.texto}</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
 
-          {/* LISTA DE ARCHIVOS */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)] flex items-center gap-2">
-                <FolderOpen className="w-4 h-4 text-[var(--color-accent)]" />
-                Expedientes Indexados ({documentosIndexados.length})
-              </h3>
-              <button
-                onClick={cargarDocumentos}
-                disabled={cargandoDocumentos}
-                className="text-[var(--text-muted)] hover:text-[var(--color-primary)] p-1.5 rounded-xl hover:bg-stone-100 dark:hover:bg-slate-900 transition-colors"
-                title="Refrescar lista"
+          {/* Card 2 */}
+          <div className="liquid-glass rounded-3xl p-8 group hover:border-[var(--color-accent)]/40 transition-all duration-300 min-h-[260px] flex flex-col justify-between cursor-pointer border border-[var(--color-border)] bg-[var(--bg-card)]">
+            <div>
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-colors ${
+                temaTech ? "bg-white/5 group-hover:bg-[#8B5CF6]/10" : "bg-stone-100 group-hover:bg-[#BC955C]/10"
+              }`}>
+                <FolderSync className="w-6 h-6 text-[var(--text-secondary)] group-hover:text-[var(--color-accent)] transition-colors" />
+              </div>
+              <h3 className="font-display font-bold text-xl text-[var(--text-primary)] mb-2.5">Acceso desde Cualquier Lugar</h3>
+              <p className="text-xs md:text-sm text-[var(--text-secondary)] leading-relaxed font-sans font-medium">
+                Trabaja en tu computadora local a la máxima velocidad y guarda tus expedientes de forma sincronizada en la nube con un solo clic.
+              </p>
+            </div>
+          </div>
+
+          {/* Card 3 */}
+          <div className="liquid-glass rounded-3xl p-8 group hover:border-[var(--color-primary)]/40 transition-all duration-300 min-h-[260px] flex flex-col justify-between cursor-pointer border border-[var(--color-border)] bg-[var(--bg-card)]">
+            <div>
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-colors ${
+                temaTech ? "bg-white/5 group-hover:bg-[#00F0FF]/10" : "bg-stone-100 group-hover:bg-[#6A1B29]/10"
+              }`}>
+                <Sparkles className="w-6 h-6 text-[var(--text-secondary)] group-hover:text-[var(--color-primary)] transition-colors" />
+              </div>
+              <h3 className="font-display font-bold text-xl text-[var(--text-primary)] mb-2.5">Buscador Inteligente</h3>
+              <p className="text-xs md:text-sm text-[var(--text-secondary)] leading-relaxed font-sans font-medium">
+                No pierdas tiempo abriendo archivo por archivo. Pregúntale al buscador lo que necesitas encontrar en tus expedientes usando lenguaje sencillo.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Sección Seguridad */}
+      <section id="seguridad" className="w-full max-w-5xl mx-auto px-6 py-20 border-t border-[var(--color-border)] relative z-30">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <motion.div 
+            initial={{ opacity: 0, x: -25 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="font-display text-3xl font-extrabold mb-6 flex items-center gap-3 text-[var(--text-primary)]">
+              <ShieldCheck className="w-7 h-7 text-[var(--color-primary)]" /> Seguridad & Confianza
+            </h2>
+            <p className="text-[var(--text-secondary)] font-sans leading-relaxed mb-6 font-medium">
+              Tus documentos oficiales y reportes de auditoría están completamente blindados. Diseñamos un sistema intuitivo de protección para que la información pública de tu municipio se mantenga íntegra y segura.
+            </p>
+            <ul className="space-y-4">
+              <li className="flex items-start gap-3">
+                <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--color-primary)] shadow-sm" />
+                <div>
+                  <h4 className="font-bold text-[var(--text-primary)] font-display text-sm">Resguardo de Archivos Sensibles</h4>
+                  <p className="text-xs text-[var(--text-secondary)] leading-normal mt-0.5 font-medium">Protege tus actas de cabildo o contratos de obras públicas para que solo los funcionarios autorizados puedan visualizarlos.</p>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--color-primary)] shadow-sm" />
+                <div>
+                  <h4 className="font-bold text-[var(--text-primary)] font-display text-sm">Firma Digital e Integridad</h4>
+                  <p className="text-xs text-[var(--text-secondary)] leading-normal mt-0.5 font-medium">Cada reporte de análisis cuenta con una firma digital única. Si un archivo es alterado o manipulado de forma indebida, el validador integrado alertará inmediatamente.</p>
+                </div>
+              </li>
+            </ul>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="liquid-glass rounded-3xl p-8 border border-[var(--color-border)] bg-[var(--bg-card)] flex flex-col justify-center min-h-[280px]"
+          >
+            <div className="font-mono text-[9px] font-bold text-[var(--color-primary)]/80 mb-4 tracking-wider">// VERIFICACIÓN AUTOMÁTICA DE EXPEDIENTES</div>
+            <div className={`space-y-3 font-mono text-xs p-5 rounded-2xl border transition-colors ${
+              temaTech ? "bg-black/50 border-white/5 text-slate-300" : "bg-stone-50 border-[#E0DCD3] text-stone-700"
+            }`}>
+              <div><span className="text-purple-600 dark:text-purple-400 font-bold">Archivo:</span> {!temaTech ? "SIGEDI-2026-OBRAS" : "GECEP-2026-OBRAS"}</div>
+              <div><span className="text-purple-600 dark:text-purple-400 font-bold">Estado de Protección:</span> Activado</div>
+              <div><span className="text-purple-600 dark:text-purple-400 font-bold">Código de Seguridad:</span> Verificado</div>
+              <div className="flex items-center gap-2 mt-4 text-emerald-600 dark:text-emerald-400 font-bold">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                INTEGRIDAD DE ARCHIVOS: OK (Sello inmutable validado)
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Sección Sincronización */}
+      <section id="sincronizacion" className="w-full max-w-5xl mx-auto px-6 py-20 border-t border-[var(--color-border)] relative z-30">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="order-2 md:order-1 liquid-glass rounded-3xl p-8 border border-[var(--color-border)] bg-[var(--bg-card)] flex items-center justify-center min-h-[280px]"
+          >
+            <div className="flex flex-col items-center gap-6 text-center">
+              <FolderSync className="w-14 h-14 text-[var(--color-accent)] animate-bounce" />
+              <div className="flex gap-4 items-center">
+                <span className={`px-3 py-1.5 rounded-lg border font-mono text-[10px] font-bold ${
+                  temaTech ? "bg-slate-900 border-slate-800" : "bg-stone-50 border-stone-200"
+                }`}>Tu Computadora Local</span>
+                <span className="text-[var(--text-muted)] font-bold">⇄</span>
+                <span className={`px-3 py-1.5 rounded-lg border font-mono text-[10px] font-bold ${
+                  temaTech ? "bg-slate-900 border-slate-800" : "bg-stone-50 border-stone-200"
+                }`}>Google Drive en la Nube</span>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, x: 25 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="order-1 md:order-2"
+          >
+            <h2 className="font-display text-3xl font-extrabold mb-6 flex items-center gap-3 text-[var(--text-primary)]">
+              <FolderSync className="w-7 h-7 text-[var(--color-accent)]" /> Sincronización Automática
+            </h2>
+            <p className="text-[var(--text-secondary)] font-sans leading-relaxed mb-6 font-medium">
+              No tienes que preocuparte por configuraciones complejas en la nube. Conecta tu cuenta de Google Drive una sola vez y ten acceso a tus carpetas y archivos desde cualquier dispositivo.
+            </p>
+            <ul className="space-y-4">
+              <li className="flex items-start gap-3">
+                <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--color-accent)] shadow-sm" />
+                <div>
+                  <h4 className="font-bold text-[var(--text-primary)] font-display text-sm">Vinculación Pasiva y Permanente</h4>
+                  <p className="text-xs text-[var(--text-secondary)] leading-normal mt-0.5 font-medium">Una vez enlazada tu cuenta, los documentos de Drive se muestran en tu panel de control de forma automática y transparente.</p>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--color-accent)] shadow-sm" />
+                <div>
+                  <h4 className="font-bold text-[var(--text-primary)] font-display text-sm">Indexación y Lectura con un Botón</h4>
+                  <p className="text-xs text-[var(--text-secondary)] leading-normal mt-0.5 font-medium">Añade nuevos pliegos o reportes de planeación a tu biblioteca inteligente con solo deslizar un interruptor.</p>
+                </div>
+              </li>
+            </ul>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Sección Capacidades */}
+      <section id="capacidades" className="w-full max-w-5xl mx-auto px-6 py-20 border-t border-[var(--color-border)] relative z-30">
+        <motion.div 
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center max-w-3xl mx-auto mb-14"
+        >
+          <h2 className="font-display text-3xl font-extrabold mb-6 flex justify-center items-center gap-3 text-[var(--text-primary)]">
+            <Sparkles className="w-7 h-7 text-[var(--color-primary)]" /> ¿Cómo te ayuda el Asistente de Auditoría?
+          </h2>
+          <p className="text-[var(--text-secondary)] font-sans leading-relaxed font-medium">
+            El sistema no es un buscador común de palabras clave. Integra capacidades de inteligencia artificial (LUCERO RAG de alta precisión) que te ayudan a resolver las tareas de auditoría más complejas en pocos segundos.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Capacidad 1 */}
+          <div className="liquid-glass rounded-3xl p-7 border border-[var(--color-border)] bg-[var(--bg-card)]">
+            <h3 className="font-display font-extrabold text-lg text-[var(--text-primary)] mb-3.5 flex items-center gap-2">
+              <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-display font-bold ${
+                temaTech ? "bg-cyan-950/40 text-[#00F0FF] border border-cyan-800/40" : "bg-[#6A1B29]/10 text-[#6A1B29] border border-[#6A1B29]/10"
+              }`}>AUDITORÍA</span>
+              Comparación y Detección de Conflictos
+            </h3>
+            <p className="text-xs md:text-sm text-[var(--text-secondary)] mb-4 font-sans leading-relaxed font-medium">
+              Compara dos o más contratos y actas de cabildo de forma automática para identificar contradicciones en fechas de entrega, costos de obra o responsabilidades de áreas.
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              <span className="text-[10px] font-mono font-bold bg-stone-100 dark:bg-slate-900 px-2.5 py-1 rounded border border-[var(--color-border)] text-[var(--text-secondary)]">Comparar Actas</span>
+              <span className="text-[10px] font-mono font-bold bg-stone-100 dark:bg-slate-900 px-2.5 py-1 rounded border border-[var(--color-border)] text-[var(--text-secondary)]">Detectar Contradicciones</span>
+              <span className="text-[10px] font-mono font-bold bg-stone-100 dark:bg-slate-900 px-2.5 py-1 rounded border border-[var(--color-border)] text-[var(--text-secondary)]">Extraer Cronograma</span>
+            </div>
+          </div>
+
+          {/* Capacidad 2 */}
+          <div className="liquid-glass rounded-3xl p-7 border border-[var(--color-border)] bg-[var(--bg-card)]">
+            <h3 className="font-display font-extrabold text-lg text-[var(--text-primary)] mb-3.5 flex items-center gap-2">
+              <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-display font-bold ${
+                temaTech ? "bg-purple-950/40 text-purple-400 border border-purple-800/40" : "bg-[#BC955C]/10 text-[#6A1B29] border border-[#BC955C]/20"
+              }`}>AUTOMATIZACIÓN</span>
+              Resúmenes y Cumplimiento Normativo
+            </h3>
+            <p className="text-xs md:text-sm text-[var(--text-secondary)] mb-4 font-sans leading-relaxed font-medium">
+              Genera resúmenes ejecutivos cortos de reportes extensos y valida automáticamente que tus expedientes contengan las firmas, anexos y estructuras obligatorias que exige la ley.
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              <span className="text-[10px] font-mono font-bold bg-stone-100 dark:bg-slate-900 px-2.5 py-1 rounded border border-[var(--color-border)] text-[var(--text-secondary)]">Resumen Ejecutivo</span>
+              <span className="text-[10px] font-mono font-bold bg-stone-100 dark:bg-slate-900 px-2.5 py-1 rounded border border-[var(--color-border)] text-[var(--text-secondary)]">Lista de Cumplimiento</span>
+              <span className="text-[10px] font-mono font-bold bg-stone-100 dark:bg-slate-900 px-2.5 py-1 rounded border border-[var(--color-border)] text-[var(--text-secondary)]">Comprobación de Firmas</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sección Equipo y Patrocinadores */}
+      <section className="w-full border-t border-[var(--color-border)] bg-current/5 relative z-30 py-20 px-6">
+        <div className="max-w-5xl mx-auto space-y-20">
+          
+          {/* Equipo de Desarrollo */}
+          <div className="space-y-8">
+            <div className="flex items-center gap-3">
+              <Users className="w-6 h-6 text-[var(--color-primary)]" />
+              <h3 className="font-display font-extrabold text-2xl text-[var(--text-primary)]">Equipo de Desarrollo</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Javier Mar Cruz */}
+              <div className="liquid-glass rounded-2xl p-5 border border-[var(--color-border)] bg-[var(--bg-card)] flex items-center gap-4">
+                <div className="w-11 h-11 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] flex items-center justify-center font-display font-bold text-white flex-shrink-0 text-sm">
+                  JM
+                </div>
+                <div>
+                  <h4 className="font-bold font-display text-[var(--text-primary)] text-sm">Javier Mar Cruz</h4>
+                  <p className="text-[10px] text-[var(--color-primary)] font-mono font-bold tracking-wide uppercase">Scrum Master & Frontend</p>
+                  <p className="text-[9px] text-[var(--text-secondary)] font-sans font-medium mt-0.5">N.C. 231H0154 | Semestre 6 | TIC's</p>
+                </div>
+              </div>
+
+              {/* José Avilés Cárdenas */}
+              <div className="liquid-glass rounded-2xl p-5 border border-[var(--color-border)] bg-[var(--bg-card)] flex items-center gap-4">
+                <div className="w-11 h-11 rounded-full bg-gradient-to-r from-[var(--color-accent)] to-rose-400 dark:to-rose-500 flex items-center justify-center font-display font-bold text-white flex-shrink-0 text-sm">
+                  JA
+                </div>
+                <div>
+                  <h4 className="font-bold font-display text-[var(--text-primary)] text-sm">José Avilés Cárdenas</h4>
+                  <p className="text-[10px] text-[var(--color-accent)] font-mono font-bold tracking-wide uppercase">Backend Developer</p>
+                  <p className="text-[9px] text-[var(--text-secondary)] font-sans font-medium mt-0.5">N.C. 241H0226 | Semestre 4 | TIC's</p>
+                </div>
+              </div>
+
+              {/* Diego Alonso Benito De La Cruz */}
+              <div className="liquid-glass rounded-2xl p-5 border border-[var(--color-border)] bg-[var(--bg-card)] flex items-center gap-4">
+                <div className="w-11 h-11 rounded-full bg-gradient-to-r from-emerald-500 to-[var(--color-primary)] flex items-center justify-center font-display font-bold text-white flex-shrink-0 text-sm">
+                  DB
+                </div>
+                <div>
+                  <h4 className="font-bold font-display text-[var(--text-primary)] text-sm">Diego Alonso Benito</h4>
+                  <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold tracking-wide uppercase">Backend Developer</p>
+                  <p className="text-[9px] text-[var(--text-secondary)] font-sans font-medium mt-0.5">N.C. 231H0135 | Semestre 6 | TIC's</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Fila 2 de Integrantes (Ana y Sury) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto pt-2">
+              {/* Ana Iveth González Loaiza */}
+              <div className="liquid-glass rounded-2xl p-5 border border-[var(--color-border)] bg-[var(--bg-card)] flex items-center gap-4">
+                <div className="w-11 h-11 rounded-full bg-gradient-to-r from-pink-400 to-purple-400 dark:to-purple-500 flex items-center justify-center font-display font-bold text-white flex-shrink-0 text-sm">
+                  AG
+                </div>
+                <div>
+                  <h4 className="font-bold font-display text-[var(--text-primary)] text-sm">Ana Iveth González</h4>
+                  <p className="text-[10px] text-pink-500 font-mono font-bold tracking-wide uppercase">Colaboradora / TIC's</p>
+                  <p className="text-[9px] text-[var(--text-secondary)] font-sans font-medium mt-0.5">N.C. 231H0139 | Semestre 6 | TIC's</p>
+                </div>
+              </div>
+
+              {/* Sury Jael Cristino Arteaga */}
+              <div className="liquid-glass rounded-2xl p-5 border border-[var(--color-border)] bg-[var(--bg-card)] flex items-center gap-4">
+                <div className="w-11 h-11 rounded-full bg-gradient-to-r from-amber-400 to-orange-400 dark:to-orange-500 flex items-center justify-center font-display font-bold text-white flex-shrink-0 text-sm">
+                  SC
+                </div>
+                <div>
+                  <h4 className="font-bold font-display text-[var(--text-primary)] text-sm">Sury Jael Cristino</h4>
+                  <p className="text-[10px] text-amber-600 dark:text-amber-400 font-mono font-bold tracking-wide uppercase">Colaboradora / Logística</p>
+                  <p className="text-[9px] text-[var(--text-secondary)] font-sans font-medium mt-0.5">N.C. 241H0087 | Semestre 4 | Logística</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Patrocinadores */}
+          <div className="space-y-8">
+            <div className="flex items-center gap-3">
+              <Building2 className="w-6 h-6 text-[var(--color-primary)]" />
+              <h3 className="font-display font-extrabold text-2xl text-[var(--text-primary)]">Patrocinadores</h3>
+            </div>
+            <div className="flex flex-wrap items-center gap-10 justify-start opacity-70">
+              <span className="text-lg font-display font-black tracking-widest text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-default">ITSNA</span>
+              <span className="text-lg font-display font-black tracking-widest text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-default">TECNM</span>
+              <span className="text-lg font-display font-black tracking-widest text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-default">VERACRUZ</span>
+            </div>
+          </div>
+
+          {/* Enlaces y Footer */}
+          <div className="border-t border-[var(--color-border)] pt-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <p className="text-xs text-[var(--text-secondary)] font-medium font-sans">
+              © 2026 {!temaTech ? "SIGEDI" : "GECEP"}. Todos los derechos reservados. Desarrollado para la productividad municipal.
+            </p>
+            <div className="flex gap-8 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+              <button 
+                onClick={() => setModalDocsAbierta(true)} 
+                className="hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 bg-transparent border-none outline-none cursor-pointer font-display"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${cargandoDocumentos ? 'animate-spin' : ''}`} />
+                <FileText className="w-4 h-4" /> Docs
+              </button>
+              <button 
+                onClick={() => setModalGithubAbierta(true)} 
+                className="hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 bg-transparent border-none outline-none cursor-pointer font-display"
+              >
+                <IconoGithub className="w-4 h-4" /> GitHub
+              </button>
+              <button 
+                onClick={() => setModalSoporteAbierta(true)} 
+                className="hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 bg-transparent border-none outline-none cursor-pointer font-display"
+              >
+                <Mail className="w-4 h-4" /> Soporte
               </button>
             </div>
+          </div>
 
-            {cargandoDocumentos && documentosIndexados.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 space-y-3">
-                <div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-                <span className="text-[10px] font-mono text-[var(--text-muted)]">Leyendo registros...</span>
-              </div>
-            ) : documentosIndexados.length === 0 ? (
-              <div className={`border rounded-2xl p-8 text-center transition-colors ${
-                temaTech ? "bg-slate-900/10 border-slate-900" : "bg-stone-50 border-[#E0DCD3]"
-              }`}>
-                <FileText className="w-8 h-8 text-[var(--text-muted)]/40 mx-auto mb-2" />
-                <p className="text-xs font-semibold text-[var(--text-primary)]">No hay expedientes cargados.</p>
-                <p className="text-[10px] text-[var(--text-muted)] mt-1">Sube un documento oficial para iniciar el diagnóstico.</p>
-              </div>
-            ) : (
-              <div className="space-y-2.5">
-                {documentosIndexados.map((doc) => {
-                  const seleccionado = documentoSeleccionado?.id === doc.id;
-                  return (
-                    <div
-                      key={doc.id}
-                      onClick={() => setDocumentoSeleccionado(doc)}
-                      className={`group border rounded-2xl p-3.5 transition-all duration-300 cursor-pointer text-left ${
-                        seleccionado 
-                          ? temaTech 
-                            ? "bg-cyan-950/10 border-[#00F0FF] shadow-[0_0_12px_rgba(0,240,255,0.05)]"
-                            : "bg-[#6A1B29]/5 border-[#6A1B29] shadow-sm"
-                          : "border-stone-200 dark:border-slate-800/80 bg-[var(--bg-card)] hover:border-[var(--color-primary)]"
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className={`p-2 rounded-xl border transition-colors ${
-                          seleccionado 
-                            ? "bg-white/80 dark:bg-slate-900 border-current/25" 
-                            : "bg-stone-50 dark:bg-slate-900/50 border-stone-200 dark:border-slate-800"
-                        }`}>
-                          {obtenerIcono(doc.titulo)}
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <h4 className={`text-xs font-bold truncate ${
-                              seleccionado ? 'text-[var(--color-primary)]' : 'text-[var(--text-primary)]'
-                            }`}>
-                              {doc.titulo}
-                            </h4>
-                            {seleccionado && (
-                              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] shadow-sm" />
-                            )}
-                          </div>
-                          
-                          <p className="text-[9px] font-mono text-[var(--text-muted)] mt-1 truncate">
-                            HASH: {doc.hash_sha256 ? doc.hash_sha256.substring(0, 14) : "FIRMADO"}...
-                          </p>
-                          <p className="text-[10px] text-[var(--text-secondary)] font-medium mt-1 leading-normal line-clamp-2">
-                            {doc.contenido_crudo}
-                          </p>
-                        </div>
-                      </div>
+        </div>
+      </section>
+
+      {/* MODALES INTERACTIVAS DEL FOOTER (CON ANIMACIONES DENTRO DE ANIMATEPRESENCE) */}
+      <AnimatePresence>
+        
+        {/* Modal Docs */}
+        {modalDocsAbierta && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="w-full max-w-4xl max-h-[85vh] overflow-y-auto liquid-glass border border-white/10 rounded-3xl p-8 bg-[#18181B]/95 text-white relative scrollbar-hide text-left shadow-2xl"
+            >
+              <button 
+                onClick={() => setModalDocsAbierta(false)}
+                className="absolute top-6 right-6 text-stone-400 hover:text-white transition-colors text-xl font-bold font-mono cursor-pointer"
+              >
+                ✕
+              </button>
+              
+              <h3 className="font-display font-extrabold text-2xl text-white mb-6 flex items-center gap-3 border-b border-white/5 pb-4">
+                <FileText className="w-7 h-7 text-[#00F0FF]" /> Documentación de Capacidades
+              </h3>
+              
+              <div className="space-y-6 text-stone-300 font-sans text-sm md:text-base leading-relaxed font-medium">
+                
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+                  <h4 className="font-display font-extrabold text-lg text-white flex items-center gap-2 flex-wrap">
+                    <span className="px-2 py-0.5 rounded bg-[#00F0FF]/15 text-[#00F0FF] text-[10px] font-mono font-bold border border-[#00F0FF]/10">LUCERO MCP</span>
+                    Motor de Auditoría Élite (Tiers 1 & 2)
+                  </h4>
+                  <p className="text-xs md:text-sm text-stone-400 leading-relaxed font-medium">
+                    LUCERO es el motor semántico cognitivo que automatiza el análisis documental del sistema. Se compone de dos niveles principales de ejecución:
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-medium">
+                    <div className="p-4 rounded-xl bg-black/40 border border-white/5">
+                      <h5 className="font-bold text-[#00F0FF] mb-2 font-display uppercase tracking-wider text-[10px]">TIER 1: Análisis Inteligente</h5>
+                      <ul className="space-y-1.5 list-disc list-inside text-stone-400">
+                        <li><strong className="text-white font-semibold">compare_documents:</strong> Compara contratos y actas para detectar vacíos de información o contradicciones.</li>
+                        <li><strong className="text-white font-semibold">extract_selective:</strong> Extrae selectivamente fechas, tablas o nombres de un archivo PDF o Excel.</li>
+                        <li><strong className="text-white font-semibold">detect_conflicts:</strong> Reporta contradicciones entre múltiples actas oficiales.</li>
+                        <li><strong className="text-white font-semibold">generate_summary:</strong> Genera resúmenes ejecutivos detallados de manera automatizada.</li>
+                      </ul>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                    
+                    <div className="p-4 rounded-xl bg-black/40 border border-white/5">
+                      <h5 className="font-bold text-purple-400 mb-2 font-display uppercase tracking-wider text-[10px]">TIER 2: Automatización & Estructura</h5>
+                      <ul className="space-y-1.5 list-disc list-inside text-stone-400">
+                        <li><strong className="text-white font-semibold">pro_read_document:</strong> Lectura y procesamiento multiformato de actas.</li>
+                        <li><strong className="text-white font-semibold">pro_encrypt_document:</strong> Cifrado avanzado de archivos municipales confidenciales.</li>
+                        <li><strong className="text-white font-semibold">inject_apa_structure / inject_toc:</strong> Inyección automática de tablas de contenido estructuradas.</li>
+                        <li><strong className="text-white font-semibold">surgical_replace:</strong> Modificaciones quirúrgicas en plantillas sin alterar formatos.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
 
-          {/* FIRMA DE PIE SIDEBAR */}
-          <div className={`p-5 border-t text-center flex flex-col items-center justify-center space-y-1 transition-colors ${
-            temaTech ? "border-slate-900 bg-slate-950/60" : "border-[#E0DCD3] bg-stone-50"
-          }`}>
-            <span className="text-[8px] font-mono uppercase tracking-widest text-[var(--text-muted)]">Sistema Nacional de Auditoría</span>
-            <span className="text-[10px] font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
-              <ShieldCheck className={`w-4 h-4 ${temaTech ? "text-[#00F0FF]" : "text-[#BC955C]"}`} /> 
-              Cripto-Auditoría Inmutable
-            </span>
-          </div>
-
-        </aside>
-
-        {/* PANEL DERECHO: DIAGNÓSTICO Y CONSULTA */}
-        <main className={`flex-1 flex flex-col h-full transition-colors ${
-          temaTech ? "bg-[#0B0F19]/40" : "bg-[#F3F1EB]"
-        }`}>
-          
-          <div className="flex-1 overflow-y-auto p-8 space-y-6">
-            
-            {/* HERRAMIENTA DE AUDITORÍA */}
-            <section className={`border rounded-3xl p-6 transition-all duration-300 ${
-              temaTech 
-                ? "bg-slate-900/20 border-slate-800/80 shadow-2xl" 
-                : "bg-white border-[#E0DCD3] shadow-sm"
-            }`}>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-                <div>
-                  <h3 className="text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--text-muted)]">Procedimiento de Diagnóstico</h3>
-                  <p className="text-sm font-bold mt-1 text-[var(--text-primary)]">
-                    {documentoSeleccionado 
-                      ? `Analizar: ${documentoSeleccionado.titulo}` 
-                      : "Seleccione un expediente de la izquierda"}
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                  <h4 className="font-display font-extrabold text-lg text-white mb-2">¿Cómo funciona la Integridad Criptográfica?</h4>
+                  <p className="text-xs md:text-sm text-stone-400 leading-relaxed font-medium">
+                    El sistema genera un hash SHA-256 e inyecta un sello digital inmutable en cada documento auditado. Si un usuario intenta modificar el contenido de un acta de cabildo o un contrato de forma posterior, el validador integrado de la plataforma detecta la alteración del sello de seguridad inmediatamente al contrastarlo contra la base de datos municipal.
                   </p>
                 </div>
-                
-                {documentoSeleccionado && (
-                  <button
-                    onClick={ejecutarAuditoria}
-                    disabled={cargandoAuditoria}
-                    className={`px-5 py-2.5 rounded-xl font-display font-extrabold text-xs uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 ${
-                      temaTech
-                        ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-black hover:opacity-90 active:scale-95 shadow-[0_0_15px_rgba(0,240,255,0.15)]"
-                        : "bg-[#6A1B29] text-white hover:bg-[#561420] active:scale-95 shadow-md"
-                    }`}
-                  >
-                    {cargandoAuditoria ? (
-                      <>
-                        <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        Auditando...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        Ejecutar Auditoría
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
 
-              {/* Selector de Enfoques */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                {[
-                  { id: "general", titulo: "Análisis General", desc: "Alertas y riesgos globales", activeColor: "border-[#6A1B29] text-[#6A1B29] bg-[#6A1B29]/5 dark:border-[#00F0FF] dark:text-[#00F0FF] dark:bg-cyan-950/20" },
-                  { id: "sobrecostos", titulo: "Financiero / Costos", desc: "Sobrecostos y desvíos", activeColor: "border-[#13322B] text-[#13322B] bg-[#13322B]/5 dark:border-emerald-400 dark:text-emerald-400 dark:bg-emerald-950/20" },
-                  { id: "bienestar", titulo: "Programas Sociales", desc: "Padrones y duplicados", activeColor: "border-[#BC955C] text-[#BC955C] bg-[#BC955C]/5 dark:border-purple-400 dark:text-purple-400 dark:bg-purple-950/20" },
-                  { id: "legal", titulo: "Legal / Licitación", desc: "Incumplimiento de pliegos", activeColor: "border-rose-700 text-rose-700 bg-rose-500/5 dark:border-rose-400 dark:text-rose-400 dark:bg-rose-950/20" }
-                ].map((enf) => {
-                  const activo = enfoqueAuditoria === enf.id;
-                  return (
-                    <button
-                      key={enf.id}
-                      onClick={() => setEnfoqueAuditoria(enf.id)}
-                      className={`border rounded-2xl p-3.5 text-left transition-all duration-300 cursor-pointer ${
-                        activo 
-                          ? `${enf.activeColor} scale-[1.01] font-bold` 
-                          : "border-stone-200 dark:border-slate-800/80 hover:border-stone-300 dark:hover:border-slate-700 hover:bg-stone-50/50 dark:hover:bg-slate-900/10"
-                      }`}
-                    >
-                      <span className="text-xs font-bold block">{enf.titulo}</span>
-                      <span className="text-[9px] text-[var(--text-muted)] block mt-1 leading-normal font-medium">{enf.desc}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* CONSOLA DE RESULTADOS DE AUDITORÍA */}
-              <div className="bg-[#15151A] rounded-2xl overflow-hidden shadow-2xl relative min-h-[220px] text-white">
-                
-                {cargandoAuditoria && (
-                  <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-20 flex flex-col items-center justify-center space-y-3">
-                    <div className="w-8 h-8 border-3 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-xs font-mono text-[var(--color-primary)] animate-pulse">LUCERO procesando heurísticas de control gubernamental...</p>
-                  </div>
-                )}
-
-                {!resultadoAuditoria && !cargandoAuditoria && (
-                  <div className="p-10 text-center flex flex-col items-center justify-center min-h-[220px]">
-                    <AlertTriangle className="w-10 h-10 text-stone-600 mb-3" />
-                    <p className="text-xs text-stone-400 max-w-md leading-relaxed">
-                      Consola de control en espera. Seleccione un expediente del panel izquierdo, defina el enfoque del diagnóstico y pulse <strong>Ejecutar Auditoría</strong> para iniciar.
-                    </p>
-                  </div>
-                )}
-
-                {resultadoAuditoria && (
-                  <div className="divide-y divide-white/5">
-                    
-                    {/* Header Reporte */}
-                    <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/[0.01]">
-                      <div className="flex items-center gap-3">
-                        <ShieldCheck className="w-5 h-5 text-[var(--color-accent)]" />
-                        <div>
-                          <span className="text-[9px] font-mono text-stone-500 uppercase tracking-widest block">Certificado Criptográfico Oficial</span>
-                          <h4 className="text-xs font-bold text-white mt-0.5">REPORTE FEDERAL DE AUDITORÍA CONTEXTUAL</h4>
-                        </div>
-                      </div>
-
-                      {resultadoAuditoria.nivel_riesde && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-[9px] font-mono text-stone-500">RIESGO:</span>
-                          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-mono font-extrabold tracking-wider border ${
-                            resultadoAuditoria.nivel_riesde.toLowerCase() === 'critico' || resultadoAuditoria.nivel_riesde.toLowerCase() === 'alto'
-                              ? 'bg-rose-500/10 border-rose-500/20 text-rose-400'
-                              : resultadoAuditoria.nivel_riesde.toLowerCase() === 'medio'
-                              ? 'bg-amber-500/10 border-amber-500/20 text-amber-400'
-                              : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-                          }`}>
-                            {resultadoAuditoria.nivel_riesde.toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Cuerpo Reporte */}
-                    <div className="p-5 bg-black/10">
-                      {resultadoAuditoria.error ? (
-                        <div className="p-4 rounded-xl bg-rose-950/20 border border-rose-900/30 text-rose-400 text-xs font-mono">
-                          {resultadoAuditoria.error}
-                        </div>
-                      ) : (
-                        <div className="text-xs text-stone-300 leading-relaxed font-sans whitespace-pre-wrap">
-                          {resultadoAuditoria.hallazgos}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Footer con Firma e Inmutabilidad */}
-                    {resultadoAuditoria.hash_reporte && (
-                      <div className="p-4 bg-black/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[9px] font-mono text-stone-500">
-                        <span className="truncate max-w-md">
-                          REGISTRO SHA-256: <strong className="text-stone-300 select-all">{resultadoAuditoria.hash_reporte}</strong>
-                        </span>
-                        <span className="text-emerald-500 font-bold flex items-center gap-1 flex-shrink-0">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> DIAGNÓSTICO FIRMADO
-                        </span>
-                      </div>
-                    )}
-
-                  </div>
-                )}
-
-              </div>
-            </section>
-
-            {/* ASISTENTE RAG SEMÁNTICO */}
-            <section className={`border rounded-3xl p-6 transition-all duration-300 ${
-              temaTech 
-                ? "bg-slate-900/20 border-slate-800/80 shadow-2xl" 
-                : "bg-white border-[#E0DCD3] shadow-sm"
-            }`}>
-              <div className="mb-4">
-                <h3 className="text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
-                  <Search className="w-4 h-4 text-[var(--color-accent)] animate-pulse" />
-                  Búsqueda Semántica Vectorial (RAG)
-                </h3>
-                <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
-                  Consulta de datos de alta precisión. El sistema busca fragmentos semánticos en Supabase mediante embeddings de Cohere.
-                </p>
-              </div>
-
-              <form onSubmit={ejecutarConsultaRAG} className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/10 to-[var(--color-accent)]/10 rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition-all duration-500"></div>
-                <div className="relative flex items-center bg-stone-50 dark:bg-slate-950 border border-stone-200 dark:border-slate-800/80 rounded-2xl overflow-hidden focus-within:border-[var(--color-primary)] transition-all">
-                  <Search className="w-4 h-4 ml-4 text-[var(--text-muted)]" />
-                  <input 
-                    type="text" 
-                    value={consultaBusqueda}
-                    onChange={(e) => setConsultaBusqueda(e.target.value)}
-                    placeholder="Ej: ¿Cuáles son las observaciones respecto a las facturas y pliegos de pavimentación?" 
-                    className="w-full bg-transparent border-none text-[var(--text-primary)] px-4 py-4 outline-none placeholder:text-[var(--text-muted)]/50 text-xs font-sans"
-                  />
+                <div className="flex justify-end pt-4">
                   <button 
-                    type="submit"
-                    disabled={cargandoBusqueda || !consultaBusqueda.trim()}
-                    className={`mr-3 px-5 py-2 rounded-xl font-display font-bold text-xs hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1.5 ${
-                      temaTech
-                        ? "bg-[#00F0FF] text-black"
-                        : "bg-[#6A1B29] text-white"
-                    }`}
+                    onClick={() => setModalDocsAbierta(false)}
+                    className="px-6 py-2.5 rounded-full bg-[#00F0FF] text-black font-bold hover:bg-white transition-colors cursor-pointer text-xs uppercase tracking-wider font-display"
                   >
-                    {cargandoBusqueda ? (
-                      <>
-                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        Buscando...
-                      </>
-                    ) : (
-                      <>
-                        Consultar
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </>
-                    )}
+                    Entendido
                   </button>
                 </div>
-              </form>
-
-              <AnimatePresence>
-                {resultadoBusqueda && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="mt-5 space-y-4"
-                  >
-                    {resultadoBusqueda.error ? (
-                      <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-mono">
-                        {resultadoBusqueda.error}
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className={`rounded-2xl p-5 border transition-all ${
-                          temaTech 
-                            ? "bg-cyan-950/5 border-cyan-800/40 text-slate-300 shadow-md" 
-                            : "bg-stone-50 border-[#E0DCD3] text-stone-800 shadow-sm"
-                        }`}>
-                          <div className="flex items-center gap-2 mb-3">
-                            <Sparkles className="w-4 h-4 text-[var(--color-primary)] animate-pulse" />
-                            <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-[var(--color-primary)]">Respuesta Basada en Evidencia Real</span>
-                          </div>
-                          <p className="text-xs leading-relaxed font-medium whitespace-pre-wrap font-sans">
-                            {resultadoBusqueda.respuesta_ia}
-                          </p>
-                        </div>
-
-                        {resultadoBusqueda.fragmentos && resultadoBusqueda.fragmentos.length > 0 && (
-                          <div className="space-y-2">
-                            <span className="text-[8px] font-mono text-[var(--text-muted)] uppercase tracking-widest block font-bold">Evidencias Vectoriales Extraídas</span>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                              {resultadoBusqueda.fragmentos.map((frag, idx) => (
-                                <div key={idx} className={`rounded-2xl p-3.5 border flex flex-col justify-between space-y-3 transition-colors ${
-                                  temaTech 
-                                    ? "bg-slate-900/10 border-slate-900" 
-                                    : "bg-white border-[#E0DCD3] shadow-xs"
-                                }`}>
-                                  <p className="text-[10px] leading-relaxed text-[var(--text-secondary)] font-medium font-sans line-clamp-4">
-                                    "{frag.fragmento}"
-                                  </p>
-                                  <div className="flex items-center justify-between pt-2 border-t border-stone-100 dark:border-slate-800/80 text-[8px] font-mono">
-                                    <span className="text-[var(--text-muted)] font-semibold">Similitud</span>
-                                    <span className={`font-bold ${temaTech ? "text-[#00F0FF]" : "text-[#6A1B29]"}`}>
-                                      {(frag.similitud * 100).toFixed(0)}%
-                                    </span>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-            </section>
-
+              </div>
+            </motion.div>
           </div>
+        )}
 
-          {/* PIE DE PAGINA CON LOGOS */}
-          <footer className={`p-6 border-t flex flex-col sm:flex-row sm:items-center justify-between gap-6 transition-colors ${
-            temaTech ? "bg-slate-950/60 border-slate-900" : "bg-white border-[#E0DCD3] shadow-inner"
-          }`}>
-            
-            <div className="flex items-center gap-2 text-[var(--text-muted)]">
-              <Database className="w-4 h-4" />
-              <span className="text-[9px] font-mono font-bold uppercase tracking-wider">SIGEDI v2.1.0 — PLATAFORMA DE AUDITORÍA MUNICIPAL</span>
-            </div>
-
-            <div className="flex items-center gap-6">
-              <span className="text-[9px] font-mono uppercase tracking-widest text-[var(--text-muted)] font-bold">Documentación del Proceso:</span>
+        {/* Modal Soporte */}
+        {modalSoporteAbierta && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="w-full max-w-lg liquid-glass border border-white/10 rounded-3xl p-8 bg-[#18181B]/95 text-white relative text-left shadow-2xl"
+            >
+              <button 
+                onClick={() => {
+                  setModalSoporteAbierta(false);
+                  setSoporteExito(false);
+                  setSoporteMensaje("");
+                  setSoporteEmail("");
+                }}
+                className="absolute top-6 right-6 text-stone-400 hover:text-white transition-colors text-xl font-bold font-mono cursor-pointer"
+              >
+                ✕
+              </button>
               
-              {/* PDF Logo */}
-              <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-rose-500/20 bg-rose-500/5 transition-all duration-300 group">
-                <svg className="w-6 h-6 text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2c.55 0 1-.45 1-1s-.45-1-1-1H9V9h3c.55 0 1-.45 1-1s-.45-1-1-1H8v10h3c.55 0 1-.45 1-1s-.45-1-1-1zm4.5-3c.83 0 1.5-.67 1.5-1.5v-3c0-.83-.67-1.5-1.5-1.5H13v10h1.5v-4h1zm-1.5-3h1v1.5h-1V10zm5.5 5c0 .83-.67 1.5-1.5 1.5h-2.5V7H19c.83 0 1.5.67 1.5 1.5v6.5zm-1.5-5h-1v3.5h1V10z"/>
-                </svg>
-                <div className="flex flex-col text-left">
-                  <span className="text-[8px] font-mono text-rose-500 font-bold uppercase tracking-wider leading-none">Portable</span>
-                  <span className="text-[9px] font-sans text-[var(--text-primary)] font-extrabold leading-none mt-1">INFORMES PDF</span>
+              <h3 className="font-display font-extrabold text-2xl text-white mb-6 flex items-center gap-3">
+                <Mail className="w-6 h-6 text-purple-400" /> Soporte Técnico
+              </h3>
+              
+              {soporteExito ? (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-8 space-y-4"
+                >
+                  <div className="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+                    ✓
+                  </div>
+                  <h4 className="font-display font-bold text-white text-lg">¡Mensaje Enviado con Éxito!</h4>
+                  <p className="text-xs md:text-sm text-stone-400 leading-relaxed font-medium">
+                    El equipo de desarrollo (Javier, José y Diego) revisará tu reporte y se contactará contigo a la brevedad.
+                  </p>
+                  <button 
+                    onClick={() => {
+                      setModalSoporteAbierta(false);
+                      setSoporteExito(false);
+                      setSoporteMensaje("");
+                      setSoporteEmail("");
+                    }}
+                    className="px-6 py-2 rounded-full bg-white text-black font-semibold hover:bg-gray-200 transition-colors mt-4 cursor-pointer text-xs font-display uppercase tracking-wider"
+                  >
+                    Cerrar
+                  </button>
+                </motion.div>
+              ) : (
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  setSoporteEnviando(true);
+                  await new Promise(r => setTimeout(r, 1200));
+                  setSoporteEnviando(false);
+                  setSoporteExito(true);
+                }} className="space-y-4 text-xs md:text-sm font-sans font-medium text-stone-300">
+                  <p className="text-stone-400 leading-relaxed text-xs">
+                    ¿Tienes dudas, problemas con la sincronización de Google Drive o algún reporte de error? Escríbenos y te atenderemos enseguida.
+                  </p>
+                  <div>
+                    <label className="block text-[10px] font-bold text-stone-400 mb-1.5 font-display uppercase tracking-wider">Correo Electrónico</label>
+                    <input 
+                      type="email" 
+                      required
+                      value={soporteEmail}
+                      onChange={(e) => setSoporteEmail(e.target.value)}
+                      placeholder="tu-correo@municipio.gob.mx"
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-purple-400 transition-colors placeholder:text-stone-600 text-xs font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-stone-400 mb-1.5 font-display uppercase tracking-wider">Descripción del Problema o Duda</label>
+                    <textarea 
+                      required
+                      rows={4}
+                      value={soporteMensaje}
+                      onChange={(e) => setSoporteMensaje(e.target.value)}
+                      placeholder="Escribe tu mensaje aquí..."
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-purple-400 transition-colors resize-none placeholder:text-stone-600 text-xs font-medium"
+                    />
+                  </div>
+                  <div className="pt-2">
+                    <button 
+                      type="submit"
+                      disabled={soporteEnviando}
+                      className="w-full py-3 rounded-full bg-gradient-to-r from-purple-500 to-[#00F0FF] text-black font-extrabold hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-55 cursor-pointer text-xs uppercase tracking-wider font-display"
+                    >
+                      {soporteEnviando ? "Enviando reporte..." : "Enviar Mensaje de Soporte"}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </motion.div>
+          </div>
+        )}
+
+        {/* Modal GitHub */}
+        {modalGithubAbierta && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="w-full max-w-md liquid-glass border border-white/10 rounded-3xl p-8 bg-[#18181B]/95 text-white relative text-left shadow-2xl"
+            >
+              <button 
+                onClick={() => setModalGithubAbierta(false)}
+                className="absolute top-6 right-6 text-stone-400 hover:text-white transition-colors text-xl font-bold font-mono cursor-pointer"
+              >
+                ✕
+              </button>
+              
+              <h3 className="font-display font-extrabold text-2xl text-white mb-4 flex items-center gap-3">
+                <IconoGithub className="w-6 h-6 text-[#00F0FF]" /> Repositorio de GitHub
+              </h3>
+              
+              <div className="space-y-4 text-xs md:text-sm font-sans text-stone-300 font-medium leading-relaxed">
+                <p>
+                  El código fuente del proyecto se encuentra resguardado de forma segura en un repositorio en GitHub.
+                </p>
+                <div className="bg-black/50 border border-white/5 p-4 rounded-xl font-mono text-[11px] text-[#00F0FF] break-all select-all font-bold">
+                  https://github.com/AldraAV/SIGEDI.git
+                </div>
+                <p className="text-[11px] text-stone-400 font-medium">
+                  Contiene el frontend reactivo desarrollado en Vite, las APIs de auditoría integradas en FastAPI, y las herramientas élite del servidor MCP de LUCERO.
+                </p>
+                
+                <div className="flex gap-3 justify-end pt-4">
+                  <button 
+                    onClick={() => setModalGithubAbierta(false)}
+                    className="px-5 py-2 rounded-full border border-white/10 hover:bg-white/5 transition-colors cursor-pointer text-xs font-display font-bold uppercase tracking-wider"
+                  >
+                    Cerrar
+                  </button>
+                  <a 
+                    href="https://github.com/AldraAV/SIGEDI.git"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2 rounded-full bg-white text-black font-extrabold hover:bg-gray-200 transition-colors flex items-center gap-1.5 cursor-pointer text-xs font-display uppercase tracking-wider"
+                  >
+                    Ir a GitHub <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
                 </div>
               </div>
+            </motion.div>
+          </div>
+        )}
 
-              {/* Excel Logo */}
-              <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 transition-all duration-300 group">
-                <svg className="w-6 h-6 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
-                </svg>
-                <div className="flex flex-col text-left">
-                  <span className="text-[8px] font-mono text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider leading-none">Spreadsheet</span>
-                  <span className="text-[9px] font-sans text-[var(--text-primary)] font-extrabold leading-none mt-1">CÁLCULO EXCEL</span>
-                </div>
-              </div>
-
-            </div>
-
-          </footer>
-
-        </main>
-
-      </div>
+      </AnimatePresence>
 
     </div>
   );

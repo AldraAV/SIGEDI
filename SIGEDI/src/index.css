@@ -21,6 +21,13 @@
   --font-display: 'Montserrat', sans-serif;
   --font-body: 'Inter', sans-serif;
   
+  /* Luces de la Landing Page */
+  --color-light-1: rgba(106, 27, 41, 0.08);
+  --color-light-2: rgba(188, 149, 92, 0.08);
+  --color-brand-cyan: #6A1B29;
+  --color-brand-cyan-muted: rgba(106, 27, 41, 0.1);
+  --color-shadow-landing: rgba(106, 27, 41, 0.15);
+
   font-family: var(--font-body);
   background-color: var(--bg-app);
   color: var(--text-primary);
@@ -42,6 +49,13 @@
   --color-accent-light: rgba(0, 240, 255, 0.05);
   --color-accent-border: rgba(0, 240, 255, 0.15);
   --color-success: #10B981; /* Esmeralda */
+
+  /* Luces de la Landing Page en modo Tech */
+  --color-light-1: rgba(0, 240, 255, 0.12);
+  --color-light-2: rgba(139, 92, 246, 0.12);
+  --color-brand-cyan: #00F0FF;
+  --color-brand-cyan-muted: rgba(0, 240, 255, 0.15);
+  --color-shadow-landing: rgba(0, 240, 255, 0.3);
   
   background-color: var(--bg-app);
   color: var(--text-primary);
@@ -91,6 +105,38 @@ html, body, #root {
 
 .font-body {
   font-family: var(--font-body);
+}
+
+/* Vidrio Líquido para Paneles (Claro por defecto, adaptativo) */
+.liquid-glass {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.65) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.85);
+  border-left: 1px solid rgba(255, 255, 255, 0.6);
+  border-right: 1px solid rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: 0 8px 32px 0 rgba(106, 27, 41, 0.03);
+}
+
+.theme-tech .liquid-glass {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 1px solid rgba(255, 255, 255, 0.04);
+  border-right: 1px solid rgba(255, 255, 255, 0.01);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.01);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Ocultar scrollbars */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Efectos de transición suaves al cambiar de tema */
