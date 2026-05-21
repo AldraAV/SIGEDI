@@ -18,6 +18,10 @@
   --color-accent-light: rgba(188, 149, 92, 0.1);
   --color-accent-border: rgba(188, 149, 92, 0.3);
   --color-success: #13322B; /* Verde Oscuro */
+  --bg-header: #6A1B29;
+  --bg-footer: #6A1B29;
+  --color-border-header: transparent;
+  --color-border-footer: transparent;
   --font-display: 'Montserrat', sans-serif;
   --font-body: 'Inter', sans-serif;
   
@@ -49,6 +53,10 @@
   --color-accent-light: rgba(0, 240, 255, 0.05);
   --color-accent-border: rgba(0, 240, 255, 0.15);
   --color-success: #10B981; /* Esmeralda */
+  --bg-header: #0B0F19;
+  --bg-footer: #0B0F19;
+  --color-border-header: rgba(0, 240, 255, 0.25);
+  --color-border-footer: rgba(0, 240, 255, 0.15);
 
   /* Luces de la Landing Page en modo Tech */
   --color-light-1: rgba(0, 240, 255, 0.12);

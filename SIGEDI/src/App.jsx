@@ -248,98 +248,74 @@ export default function App() {
         <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-b from-transparent via-current/5 to-[var(--bg-app)] z-20 pointer-events-none" />
       </div>
 
-      {/* Encabezado / Navegación */}
-      <header className={`absolute top-0 w-full px-12 py-8 flex justify-between items-center z-50`}>
+      {/* Encabezado / Navegación - Franja plana y rectangular estilo gob.mx */}
+      <header className="absolute top-0 left-0 right-0 w-full h-16 bg-[var(--bg-header)] border-b border-[var(--color-border-header)] flex justify-between items-center px-6 md:px-12 z-50 transition-colors duration-500 select-none">
         <div 
-          className="flex items-center gap-3.5 cursor-pointer group" 
+          className="flex items-center gap-3 cursor-pointer select-none group" 
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
-          {!temaTech ? (
-            <div className="text-[#6A1B29] transition-all duration-300 group-hover:drop-shadow-[0_0_10px_rgba(106,27,41,0.3)]">
-              <EscudoNacional className="w-9 h-9" />
-            </div>
-          ) : (
-            <div className="text-[#00F0FF] transition-all duration-300 group-hover:drop-shadow-[0_0_10px_rgba(0,240,255,0.4)]">
-              <IconoCapas className="w-8 h-8" />
-            </div>
-          )}
-          <span className="font-display font-black text-2xl tracking-tighter text-[var(--text-primary)] transition-colors duration-300 group-hover:text-[var(--color-primary)]">
-            {!temaTech ? "SIGEDI" : "GECEP"}
-          </span>
+          <div className={temaTech ? "text-cyan-400" : "text-[#BC955C]"}>
+            <EscudoNacional className="w-9 h-9" />
+          </div>
+          <div className="flex flex-col text-left leading-none text-white border-l border-white/20 pl-3">
+            <span className="text-[10px] tracking-wider uppercase font-semibold opacity-85">Gobierno de México</span>
+            <span className="text-base font-display font-extrabold tracking-tight">SIGEDI</span>
+          </div>
         </div>
 
-        <nav className="hidden md:flex gap-10 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
-          <button onClick={() => hacerScrollASeccion("seguridad")} className="hover:text-[var(--color-primary)] transition-colors cursor-pointer bg-transparent border-none outline-none font-display">Seguridad</button>
-          <button onClick={() => hacerScrollASeccion("sincronizacion")} className="hover:text-[var(--color-primary)] transition-colors cursor-pointer bg-transparent border-none outline-none font-display">Sincronización</button>
-          <button onClick={() => hacerScrollASeccion("capacidades")} className="hover:text-[var(--color-primary)] transition-colors cursor-pointer bg-transparent border-none outline-none font-display">Capacidades</button>
-        </nav>
+        <div className="flex items-center gap-8">
+          <nav className="hidden md:flex gap-8 text-xs font-bold uppercase tracking-wider text-white/80">
+            <button onClick={() => hacerScrollASeccion("seguridad")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none outline-none font-display">Seguridad</button>
+            <button onClick={() => hacerScrollASeccion("sincronizacion")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none outline-none font-display">Sincronización</button>
+            <button onClick={() => hacerScrollASeccion("capacidades")} className="hover:text-white transition-colors cursor-pointer bg-transparent border-none outline-none font-display">Capacidades</button>
+          </nav>
 
-        {/* Switcher de Temas */}
-        <div className={`p-1 rounded-full border flex items-center gap-1 transition-colors ${
-          temaTech ? "bg-slate-900 border-slate-800" : "bg-stone-100 border-[#E0DCD3]"
-        }`}>
-          <button
-            onClick={() => setTemaTech(false)}
-            className={`px-3 py-1 rounded-full text-[9px] font-display font-bold uppercase transition-all tracking-wide cursor-pointer ${
-              !temaTech 
-                ? "bg-[#6A1B29] text-white shadow-sm" 
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            Gobierno
-          </button>
-          <button
-            onClick={() => setTemaTech(true)}
-            className={`px-3 py-1 rounded-full text-[9px] font-display font-bold uppercase transition-all tracking-wide cursor-pointer ${
-              temaTech 
-                ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-black shadow-md" 
-                : "text-stone-500 hover:text-[#6A1B29]"
-            }`}
-          >
-            Auditoría
-          </button>
+          {/* Switcher de Temas - Compacto */}
+          <div className={`p-0.5 rounded-full border flex items-center gap-1 transition-colors ${
+            temaTech ? "bg-slate-900/60 border-slate-800" : "bg-white/10 border-white/20"
+          }`}>
+            <button
+              onClick={() => setTemaTech(false)}
+              className={`px-3 py-1 rounded-full text-[9px] font-display font-bold uppercase transition-all tracking-wide cursor-pointer ${
+                !temaTech 
+                  ? "bg-white text-black shadow-sm" 
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              Gobierno
+            </button>
+            <button
+              onClick={() => setTemaTech(true)}
+              className={`px-3 py-1 rounded-full text-[9px] font-display font-bold uppercase transition-all tracking-wide cursor-pointer ${
+                temaTech 
+                  ? "bg-cyan-400 text-black shadow-sm" 
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              Auditoría
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
       <section className="relative z-10 flex flex-col items-center justify-center text-center px-6 min-h-screen w-full max-w-5xl mx-auto pt-24">
         
-        {/* Etiqueta / Ribbon */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className={`mb-6 px-4 py-1.5 rounded-full border text-[10px] font-mono font-bold tracking-widest uppercase transition-all ${
-            temaTech 
-              ? "bg-cyan-950/40 border-cyan-800/40 text-[#00F0FF]" 
-              : "bg-[#6A1B29]/5 border-[#6A1B29]/20 text-[#6A1B29]"
-          }`}
-        >
-          {!temaTech ? "PLATAFORMA NACIONAL DE AUDITORÍA" : "CRYPTOGRAPHIC VECTOR CONSOLE"}
-        </motion.div>
-
-        {/* Titulo Principal */}
+        {/* Titulo Principal - Fijo sobre SIGEDI, pero con gradiente dinámico */}
         <motion.h1 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
           className="font-display text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-[var(--text-primary)] leading-[1.05] mb-8"
         >
-          {!temaTech ? (
-            <>
-              Sistema Inteligente de <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6A1B29] via-[#BC955C] to-[#6A1B29]">
-                Gestión Documental
-              </span>
-            </>
-          ) : (
-            <>
-              Gestión Estratégica Contextual <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F0FF] via-purple-400 to-[#00F0FF]">
-                de Expedientes Públicos
-              </span>
-            </>
-          )}
+          Sistema Inteligente de <br/>
+          <span className={`text-transparent bg-clip-text bg-gradient-to-r transition-all duration-500 ${
+            temaTech 
+              ? "from-[#00F0FF] via-purple-400 to-[#00F0FF]" 
+              : "from-[#6A1B29] via-[#BC955C] to-[#6A1B29]"
+          }`}>
+            Gestión Documental
+          </span>
         </motion.h1>
 
         {/* Subtitulo descriptivo */}
@@ -695,36 +671,59 @@ export default function App() {
               <span className="text-lg font-display font-black tracking-widest text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-default">VERACRUZ</span>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Enlaces y Footer */}
-          <div className="border-t border-[var(--color-border)] pt-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <p className="text-xs text-[var(--text-secondary)] font-medium font-sans">
-              © 2026 {!temaTech ? "SIGEDI" : "GECEP"}. Todos los derechos reservados. Desarrollado para la productividad municipal.
-            </p>
-            <div className="flex gap-8 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
-              <button 
-                onClick={() => setModalDocsAbierta(true)} 
-                className="hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 bg-transparent border-none outline-none cursor-pointer font-display"
-              >
-                <FileText className="w-4 h-4" /> Docs
-              </button>
-              <button 
-                onClick={() => setModalGithubAbierta(true)} 
-                className="hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 bg-transparent border-none outline-none cursor-pointer font-display"
-              >
-                <IconoGithub className="w-4 h-4" /> GitHub
-              </button>
-              <button 
-                onClick={() => setModalSoporteAbierta(true)} 
-                className="hover:text-[var(--color-primary)] transition-colors flex items-center gap-1.5 bg-transparent border-none outline-none cursor-pointer font-display"
-              >
-                <Mail className="w-4 h-4" /> Soporte
-              </button>
+      {/* Footer Rectangular Plano Estilo gob.mx */}
+      <footer className="w-full bg-[var(--bg-footer)] border-t border-[var(--color-border-footer)] relative z-30 py-12 px-6 md:px-12 transition-colors duration-500">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+          {/* Lado izquierdo: Logotipo oficial */}
+          <div className="flex items-center gap-3">
+            <div className={temaTech ? "text-cyan-400" : "text-[#BC955C]"}>
+              <EscudoNacional className="w-10 h-10" />
+            </div>
+            <div className="flex flex-col text-left leading-none text-white border-l border-white/20 pl-3">
+              <span className="text-[10px] tracking-wider uppercase font-semibold opacity-85">Gobierno de México</span>
+              <span className="text-base font-display font-extrabold tracking-tight">SIGEDI</span>
             </div>
           </div>
 
+          {/* Enlaces de Utilidad */}
+          <div className="flex gap-8 text-xs font-bold uppercase tracking-wider text-white/80">
+            <button 
+              onClick={() => setModalDocsAbierta(true)} 
+              className="hover:text-white transition-colors flex items-center gap-1.5 bg-transparent border-none outline-none cursor-pointer font-display"
+            >
+              <FileText className="w-4 h-4" /> Docs
+            </button>
+            <button 
+              onClick={() => setModalGithubAbierta(true)} 
+              className="hover:text-white transition-colors flex items-center gap-1.5 bg-transparent border-none outline-none cursor-pointer font-display"
+            >
+              <IconoGithub className="w-4 h-4" /> GitHub
+            </button>
+            <button 
+              onClick={() => setModalSoporteAbierta(true)} 
+              className="hover:text-white transition-colors flex items-center gap-1.5 bg-transparent border-none outline-none cursor-pointer font-display"
+            >
+              <Mail className="w-4 h-4" /> Soporte
+            </button>
+          </div>
+
+          {/* Créditos del Equipo */}
+          <div className="text-center md:text-right text-[10px] text-white/60 font-sans leading-tight">
+            <span className="block font-bold text-white/80 uppercase font-display tracking-wider mb-1">Desarrolladores SIGEDI</span>
+            Javier Mar • José Avilés • Diego Alonso • Ana Iveth • Sury Cristino
+          </div>
         </div>
-      </section>
+
+        {/* Fila de Derechos Reservados */}
+        <div className="max-w-6xl mx-auto border-t border-white/10 mt-8 pt-6 text-center">
+          <p className="text-[10px] text-white/50 font-medium font-sans">
+            © 2026 SIGEDI. Todos los derechos reservados. Desarrollado en colaboración con ITSNA y TecNM para la gestión pública inteligente.
+          </p>
+        </div>
+      </footer>
 
       {/* MODALES INTERACTIVAS DEL FOOTER (CON ANIMACIONES DENTRO DE ANIMATEPRESENCE) */}
       <AnimatePresence>
